@@ -1,6 +1,7 @@
 package ufw.tweedeofyme.ui;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -55,9 +56,11 @@ public class TimelineActivity extends ListActivity {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_logout:
-                // TODO Logout code goes here.
-                Toast.makeText(getApplicationContext(), "Logout to be implemented",
-                        Toast.LENGTH_SHORT).show();
+                // Clear active Twitter Session and Finish the Activity
+                Twitter.getSessionManager().clearActiveSession();
+                SessionRecorder.recordSessionInactive("Logout: accounts deactivated");
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

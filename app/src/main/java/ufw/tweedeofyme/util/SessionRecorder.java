@@ -4,8 +4,6 @@ package ufw.tweedeofyme.util;
  * Created by Faisal on 21-05-2015.
  */
 
-import android.util.Log;
-
 import com.twitter.sdk.android.core.Session;
 
 public class SessionRecorder {
