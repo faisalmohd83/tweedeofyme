@@ -11,10 +11,8 @@ import com.twitter.sdk.android.core.Session;
 public class SessionRecorder {
 
     private static Long userId;
-    private static Session mSession = null;
 
     public static Session recordInitialSessionState(Session twitterSession) {
-        mSession = twitterSession;
         if (twitterSession != null) {
             recordSessionActive("Splash: user with active Twitter session", twitterSession);
             return twitterSession;
@@ -26,7 +24,6 @@ public class SessionRecorder {
 
     public static void recordSessionActive(String message, Session session) {
         userId = session.getId();
-        mSession = session;
         recordSessionActive(message, String.valueOf(session.getId()));
     }
 
@@ -45,9 +42,5 @@ public class SessionRecorder {
 
     public static Long getUserId() {
         return userId;
-    }
-
-    public static Session getSession() {
-        return mSession;
     }
 }
