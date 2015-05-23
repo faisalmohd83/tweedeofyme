@@ -13,7 +13,7 @@
     <string name="title_activity_timeline">TimelineActivity</string>
 
     <string name="action_logout">Logout</string>
-    <string name="empty">Oops! No tweets yet.</string>
+    <string name="emptyList">Oops! No tweets yet.</string>
     <string name="tweet_hint">what\'s on your mind?</string>
     <string name="tweet_text">Tweet</string>
 </resources>
