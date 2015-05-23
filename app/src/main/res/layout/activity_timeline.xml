@@ -43,7 +43,7 @@
             android:layout_weight="1"
             android:hint="@string/tweet_hint"
             android:imeActionLabel="@string/tweet_text"
-            android:imeOptions="actionSend"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLength="140" />
 

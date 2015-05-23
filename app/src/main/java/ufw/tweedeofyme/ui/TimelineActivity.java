@@ -56,6 +56,8 @@ public class TimelineActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 // TODO Logout code goes here.
+                Toast.makeText(getApplicationContext(), "Logout to be implemented",
+                        Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -80,11 +82,7 @@ public class TimelineActivity extends ListActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 String tweetMsg = tweetBox.getText().toString();
-                if (actionId == EditorInfo.IME_ACTION_SEND ||
-                        actionId == EditorInfo.IME_ACTION_DONE ||
-                        event.getAction() == KeyEvent.ACTION_DOWN ||
-                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                     if (tweetMsg.length() > 0) {
                         handled = shareTweet(tweetMsg);
                     }
@@ -99,7 +97,7 @@ public class TimelineActivity extends ListActivity {
                 Twitter.getSessionManager().getActiveSession()
         );
 
-        if (activeSession != null) {
+        if (activeSession == null) {
             return false;
         }
 
@@ -112,13 +110,13 @@ public class TimelineActivity extends ListActivity {
                         //Do something with result, which provides a Tweet inside of result.data
                         Toast.makeText(getApplicationContext(), "Tweeted successfully",
                                 Toast.LENGTH_SHORT).show();
-                        //timelineAdapter.notifyDataSetChanged();
+                        timelineAdapter.notifyDataSetChanged();
                         tweetBox.setText(null);
                     }
 
                     public void failure(TwitterException exception) {
                         //Do something on failure
-                        Toast.makeText(getApplicationContext(), "Tweeting failed",
+                        Toast.makeText(getApplicationContext(), "Oops! something went wrong. Try again.",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
