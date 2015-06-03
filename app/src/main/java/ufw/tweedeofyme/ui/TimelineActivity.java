@@ -3,6 +3,7 @@ package ufw.tweedeofyme.ui;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.services.StatusesService;
+import com.twitter.sdk.android.tweetui.TimelineResult;
 import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
 import com.twitter.sdk.android.tweetui.UserTimeline;
 
@@ -114,6 +116,7 @@ public class TimelineActivity extends ListActivity {
                         Toast.makeText(getApplicationContext(), "Tweeted successfully",
                                 Toast.LENGTH_SHORT).show();
                         timelineAdapter.notifyDataSetChanged();
+                        timelineAdapter.refresh(new TimelineUpdateCallback());
                         tweetBox.setText(null);
                     }
 
@@ -127,5 +130,15 @@ public class TimelineActivity extends ListActivity {
         return true;
     }
 
+    private static class TimelineUpdateCallback extends Callback<TimelineResult<Tweet>> {
+        @Override
+        public void success(Result<TimelineResult<Tweet>> result) {
+            Log.d(TAG, "Result - Success");
+        }
 
+        @Override
+        public void failure(TwitterException e) {
+            Log.d(TAG, "Result - Failure");
+        }
+    }
 }
