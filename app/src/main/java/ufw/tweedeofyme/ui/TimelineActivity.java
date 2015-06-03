@@ -3,13 +3,16 @@ package ufw.tweedeofyme.ui;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,10 +32,16 @@ import com.twitter.sdk.android.tweetui.UserTimeline;
 import ufw.tweedeofyme.R;
 import ufw.tweedeofyme.util.SessionRecorder;
 
-public class TimelineActivity extends ListActivity {
+public class TimelineActivity extends ListActivity implements AbsListView.OnScrollListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "TimelineActivity";
+
+    boolean enableRefresh = false;
+
     EditText tweetBox;
+    ListView listView;
+    SwipeRefreshLayout swipeLayout;
     TweetTimelineListAdapter timelineAdapter;
 
     @Override
@@ -40,9 +49,22 @@ public class TimelineActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
+        listView = (ListView) findViewById(android.R.id.list);
+
         // UI setup
         loadUserTimeline();
         prepareTweetbox();
+
+        // set custom scroll listener to enable swipe refresh layout only when at list top
+        listView.setOnScrollListener(this);
+
+        // specify action to take on swipe refresh
+        swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setColorSchemeResources(android.R.color.holo_red_light,
+                android.R.color.holo_blue_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light);
     }
 
     @Override
@@ -73,11 +95,10 @@ public class TimelineActivity extends ListActivity {
         Long userId = SessionRecorder.getUserId();
         if (userId != null) {
             UserTimeline userTimeline = new UserTimeline.Builder().userId(userId).build();
-
             timelineAdapter = new TweetTimelineListAdapter(this, userTimeline);
             setListAdapter(timelineAdapter);
         } else
-            getListView().setEmptyView(findViewById(R.id.loading));
+            listView.setEmptyView(findViewById(R.id.loading));
     }
 
     private void prepareTweetbox() {
@@ -130,15 +151,40 @@ public class TimelineActivity extends ListActivity {
         return true;
     }
 
-    private static class TimelineUpdateCallback extends Callback<TimelineResult<Tweet>> {
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (listView != null && listView.getChildCount() > 0) {
+            // check that the first item is visible and that its top matches the parent
+            enableRefresh = listView.getFirstVisiblePosition() == 0 &&
+                    listView.getChildAt(0).getTop() >= 0;
+        } else {
+            enableRefresh = false;
+        }
+        swipeLayout.setEnabled(enableRefresh);
+    }
+
+    @Override
+    public void onRefresh() {
+        swipeLayout.setRefreshing(true);
+        timelineAdapter.refresh(new TimelineUpdateCallback());
+    }
+
+    private class TimelineUpdateCallback extends Callback<TimelineResult<Tweet>> {
         @Override
         public void success(Result<TimelineResult<Tweet>> result) {
             Log.d(TAG, "Result - Success");
+            swipeLayout.setRefreshing(false);
         }
 
         @Override
         public void failure(TwitterException e) {
             Log.d(TAG, "Result - Failure");
+            swipeLayout.setRefreshing(false);
         }
     }
 }
